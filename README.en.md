@@ -19,7 +19,7 @@ The available design resources are listed below.<br>
 | Hardware | Bill of Materials | [BOM_list.pdf](./hardware/BOM_list.pdf) |
 | Hardware | PCB Image | [boaud_image.png](./hardware/boaud_image.png) |
 | 3D Model | Inner Case Lid | [ABXY-Inner.stl](./3d-model/ABXY-Inner.stl) |
-| 3D Model | LED Alignment Tool | [LED-3ｍｍPoint.stl](./3d-model/LED-3ｍｍPoint.stl) |
+| 3D Model | LED Alignment Tool | [LED-3mmPoint.stl](./3d-model/LED-3mmPoint.stl) |
 | Software | Source Code | [esp32c6_abxy](./source/esp32c6_abxy/) |
 
 ## Documents

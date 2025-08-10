@@ -18,7 +18,7 @@ To build the device, you’ll need to gather the required tools and parts, and m
 | <img src="../image/MAKE/4-button-case.jpg" width="128"> | (A1) 4-button case | Either SF or SNES version | Obtain from flea markets, as the gacha sale has ended |
 | <img src="../image/MAKE/assembled-board.jpg" width="128"> | (A2) Assembled PCB | Created from design files | - |
 | <img src="../image/MAKE/inner.jpg" width="128"> | (A3) Inner lid for PCB | 3D printed | [ABXY-Inner.stl](./3d-model/ABXY-Inner.stl) |
-| <img src="../image/MAKE/led3mm-point.jpg" width="128"> | (A4) LED alignment plate | 3D printed | [LED-3mmPoint.stl](./3d-model/ABXY-Inner.stl) |
+| <img src="../image/MAKE/led3mm-point.jpg" width="128"> | (A4) LED alignment plate | 3D printed | [LED-3mmPoint.stl](./3d-model/LED-3mmPoint.stl) |
 | <img src="../image/MAKE/ripo-battery.jpg" width="128"> | (A5) Lithium-ion polymer battery | Fits inside the case (35x20x5mm) | 300mAh |
 | <img src="../image/MAKE/clear-soft.jpg" width="128"> | (A6) Clear soft plastic rod (3mm) | Used to extend LED light | Cut to 6mm length |
 | <img src="../image/MAKE/usb-type-c.jpg" width="128"> | (A7) USB Type-C cable | For charging and programming | - |

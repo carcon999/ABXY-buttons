@@ -19,7 +19,7 @@
 | ハードウェア | 部品表 | [BOM_list.pdf](./hardware/BOM_list.pdf) |
 | ハードウェア | 基板 | [boaud_image.png](./hardware/boaud_image.png) |
 | 3Dデータ | ケース内蓋 | [ABXY-Inner.stl](./3d-model/ABXY-Inner.stl) |
-| 3Dデータ | LED位置合わせ用 | [LED-3ｍｍPoint.stl](./3d-model/LED-3ｍｍPoint.stl) |
+| 3Dデータ | LED位置合わせ用 | [LED-3mmPoint.stl](./3d-model/LED-3mmPoint.stl) |
 | ソフトウェア | ソースコード | [esp32c6_abxy](./source/esp32c6_abxy/) |
 
 ## ドキュメント

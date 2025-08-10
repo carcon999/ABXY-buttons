@@ -17,7 +17,7 @@
 |<img src="../image/MAKE/4-button-case.jpg" width="128">| (A1)4ボタンケース | SF/SNESのどちらか | ガチャ販売終了のためフリマサイト等で調達 |
 |<img src="../image/MAKE/assembled-board.jpg" width="128">| (A2)実装済み基板 | 設計資料で作成する | - |
 |<img src="../image/MAKE/inner.jpg" width="128">| (A3)基板用内蓋 | 3Dプリンターで作成する | [ABXY-Inner.stl](./3d-model/ABXY-Inner.stl) |
-|<img src="../image/MAKE/led3mm-point.jpg" width="128">| (A4)LED位置合わせプレート | 3Dプリンターで作成する |  [LED-3mmPoint.stl](./3d-model/ABXY-Inner.stl) |
+|<img src="../image/MAKE/led3mm-point.jpg" width="128">| (A4)LED位置合わせプレート | 3Dプリンターで作成する |  [LED-3mmPoint.stl](./3d-model/LED-3mmPoint.stl) |
 |<img src="../image/MAKE/ripo-battery.jpg" width="128">| (A5)リチウムイオンポリマー電池 | ケースに収まるサイズ(35x20x5mm) |  300mAh |
 |<img src="../image/MAKE/clear-soft.jpg" width="128">| (A6)透明ソフトプラ材（丸棒3mm）| LED光延長 | 長さは6㎜にカットして利用 |
 |<img src="../image/MAKE/usb-type-c.jpg" width="128">| (A7)USB Type-Cケーブル | 充電、プログラム用 | - |

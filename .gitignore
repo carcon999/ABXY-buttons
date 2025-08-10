@@ -1,0 +1,18 @@
+# OSファイル
+.DS_Store
+Thumbs.db
+
+# ビルド成果物
+# /dist/
+/build/
+
+# vscode
+/.vscode/
+/source/esp32c6_abxy/.theia/
+
+# ログと一時ファイル
+*.log
+*.tmp
+
+#作業用
+/private_work/

@@ -1,19 +1,24 @@
 ## Build Instructions
+The ESP32 and BLE libraries are frequently updated, and using different versions may cause errors. Please be careful when using versions other than the ones listed below.  
+The environment I used is as follows:
 
-ESP32 and BLE libraries are frequently updated, so using a different version may cause build errors.  
-Please be careful when using versions other than the ones listed below, which I have confirmed to work:
-
-- [Arduino IDE 2.3.6](https://www.arduino.cc/en/software/)
-- Board Manager: [esp32 by Espressif Systems 3.2.1](https://github.com/espressif/arduino-esp32)
-- BLE Library: [ESP32-BLE-Keyboard](https://github.com/carcon999/ESP32-BLE-Keyboard)  
-  This is a modified version based on “[Creating a login button with XIAO ESP32C6 BLE](https://qiita.com/nori-dev-akg/items/249988fd87bd9a589bde)”.
+- [Arduino IDE 2.3.6](https://www.arduino.cc/en/software/)  
+- Board Manager: [esp32 by Espressif Systems 3.3.0](https://github.com/espressif/arduino-esp32)  
+- BLE library: [NimBLE-Arduino by h2zero 2.3.4](https://github.com/h2zero/NimBLE-Arduino)  
+- Keyboard library: [ESP32-NIMBLE-Keyboard](https://github.com/Berg0162/ESP32-NIMBLE-Keyboard)  
 
 ### Prerequisites
-Arduino IDE must be installed, and the XIAO ESP32C6 board must already be set up.  
-If you are using it for the first time, please follow the [official Seeed Studio guide](https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/).
+This guide assumes that Arduino IDE is installed and that the **XIAO ESP32C6** board is available in your environment.  
+If this is your first time setting up the board, please refer to [Seeed Studio’s official guide](https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/).  
 
-### Installing the Library
-The [original library](https://github.com/T-vK/ESP32-BLE-Keyboard) unfortunately causes build errors, so please download and add [this forked and fixed version](https://github.com/carcon999/ESP32-BLE-Keyboard) to your Arduino libraries.
+### Installing Libraries
+You need to install two libraries:  
+
+1. Open the Arduino Library Manager, search for **“NimBLE-Arduino”**, and install version **2.3.4** (see image on the left).  
+2. Download [ESP32-NIMBLE-Keyboard](https://github.com/Berg0162/ESP32-NIMBLE-Keyboard) as a ZIP file and add it to Arduino.  
+
+![Library installation image](../image/SOFTWARE_BUILD/library.png)  
+
 
 ### Arduino IDE Settings
 In the **Tools** menu, set the following:

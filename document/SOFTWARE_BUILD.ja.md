@@ -1,16 +1,20 @@
 ## ビルド方法
 ESP32やBLEのライブラリは更新が頻繁にあるので、Versionが異なるとエラーが発生することがあります。異なるVersionを利用する際には注意してください。私は以下のものを利用しています。
 - [Arduino IDE 2.3.6](https://www.arduino.cc/en/software/)
-- ボードマネージャー [esp32 by Espressif Systems 3.2.1](https://github.com/espressif/arduino-esp32)
-- BLEライブラリ [ESP32-BLE-Keyboard](https://github.com/carcon999/ESP32-BLE-Keyboard)<br>
- 上記は、[XIAO ESP32C6のBLEでログインボタンを作る](https://qiita.com/nori-dev-akg/items/249988fd87bd9a589bde)の修正を利用させていただきました。
+- ボードマネージャー [esp32 by Espressif Systems 3.3.0](https://github.com/espressif/arduino-esp32)
+- BLEライブラリ [NimBLE-Arduino by h2zero 2.3.4](https://github.com/h2zero/NimBLE-Arduino)
+- キーボードライブラリ [ESP32-NIMBLE-Keyboard](https://github.com/Berg0162/ESP32-NIMBLE-Keyboard)
 
 ### 前提条件
 Arduino IDEインストールと、XIAO ESP32C6のボードが利用できている状態とします。
 もし、はじめて利用する場合には、[Seeed Studioの公式ブログ](https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/)を参考に構築してください。
 
 ### ライブラリのインストール
-[本家のライブラリ](https://github.com/T-vK/ESP32-BLE-Keyboard)は、残念ながらビルドエラーが発生してしまうので、[Forkしたこちらの修正版](https://github.com/carcon999/ESP32-BLE-Keyboard)をダウンロードして、Arduinoライブラリに追加します。
+ライブラリを2つインストールします。
+- 最初に、Arduinoのライブラリマネージャーで、"NimBLE-Arduino"を検索すると表示されますので、2.3.4版をインストールします。（画像左）
+- 次に、[ESP32-NIMBLE-Keyboard](https://github.com/Berg0162/ESP32-NIMBLE-Keyboard)をzipダウンロードして追加します。
+
+![ライブラリイメージ画像](../image/SOFTWARE_BUILD/library.png)
 
 ### Arduno IDEの設定
 「メニュー」の「ツール」で下記の設定に合わせる。

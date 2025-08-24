@@ -1,11 +1,8 @@
 #ifndef MY_BLE_KEYBOARD_H
 #define MY_BLE_KEYBOARD_H
 
-#include <BleKeyboard.h> // Base BleKeyboard class
-#include "BLEDevice.h"
-#include "esp_bt_main.h"
-#include "esp_gap_ble_api.h"
-#include "esp_bt_defs.h"
+#include <NimBleKeyboard.h> // Base BleKeyboard class
+
 #include "DebugSerial.h"  // For debug logging
 
 // コールバック関数の型を定義
@@ -18,19 +15,19 @@ public:
 
     // コールバック関数を設定するメソッド
     void setConnectionCallback(ConnectionCallback callback);
-
+    
     void begin(uint8_t init_batt);
 
     void end(void);
 
     bool isConnected(void);
 
-protected:
-    virtual void onConnect(BLEServer* pServer) override;
-    virtual void onDisconnect(BLEServer* pServer) override;
+ protected:
+  virtual void onStarted(NimBLEServer *pServer) override;
+  virtual void onConnect(NimBLEServer* pServer, NimBLEConnInfo &connInfo) override;
+  virtual void onDisconnect(NimBLEServer* pServer, NimBLEConnInfo &connInfo, int reason) override;
 
 private:
-    void startAdvertising(BLEServer* pServer);
 
     ConnectionCallback _connectionCallback = nullptr; // コールバック関数ポインタ
     bool _lastConnectedState = false; // 前回の接続状態を保持する変数 ★追加点★

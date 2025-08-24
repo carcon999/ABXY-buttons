@@ -1,11 +1,5 @@
 #include "Setting.h" // User-defined pin definitions and other constants
 #include "MyBleKeyboard.h"
-#include "BLEDevice.h" 
-#include "esp_bt_main.h" 
-#include "esp_gap_ble_api.h" 
-#include "esp_bt_defs.h" 
-#include "esp_log.h" 
-#include "esp_sleep.h" 
 #include "nvs_flash.h"
 
 // Include custom classes
@@ -79,7 +73,10 @@ SleepManager sleepManager(wakeupPins, NUM_WAKEUP_PINS);
 LedController led(LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_BUILTIN);
 BatteryManager batteryManager(BATT_PIN, BATT_MAX, BATT_MIN);
 
+static unsigned long mDisconnectedTime; 
+
 // --- Function Prototypes ---
+void checkAdvertisingTimeout(void);
 void handleConnectionStatusChange(bool isConnected);
 void enterDeepSleep(void); // Centralized function to enter deep sleep
 void onBatteryLevelChange(uint8_t newLevel);
@@ -148,7 +145,7 @@ void setup() {
     Debug.printf("initialBatteryLevel: %d%%\n", initialBatteryLevel);
 
     bleKeyboard.begin(initialBatteryLevel);
-
+    mDisconnectedTime = millis();
 
     buttonManager.setButtonCallback(onButtonStateChange);
     buttonManager.setLongPressCallback(KEY_CENTER_PIN, onButtonCenterLongPress);
@@ -181,6 +178,9 @@ void loop() {
     }
 #endif
 
+    // Avoid prolonged periods of disconnection. Reduce battery consumption.
+    checkAdvertisingTimeout();
+
     // Update and report battery level via BatteryManager
     batteryManager.handleBatteryUpdate();
 
@@ -190,12 +190,22 @@ void loop() {
 // ==============================================================================
 // === Helper Functions =========================================================
 // ==============================================================================
+void checkAdvertisingTimeout(void){
+    if(mDisconnectedTime != 0){
+        if(millis() - mDisconnectedTime > ADVERTISING_TIMEOUT_MS){
+            Debug.println("Unable to connect, entering Deep Sleep...");
+            enterDeepSleep();
+        }
+    }
+}
 
 // 接続状態が変化したときに呼び出されるコールバック関数
 void handleConnectionStatusChange(bool isConnected) {
     if (isConnected) {
+        mDisconnectedTime = 0;  // clear
         Debug.println("Callback: BLE connected! Setting LED to green.");
     } else {
+        mDisconnectedTime = millis();
         Debug.println("Callback: BLE disconnected! Starting red blinking.");
     }
 
@@ -299,10 +309,7 @@ void factory_reset(void) {
     led.setColor(COLOR_YELLOW);
 
     // Bluetooth スタック停止
-    esp_bluedroid_disable();
-    esp_bluedroid_deinit();
-    esp_bt_controller_disable();
-    esp_bt_controller_deinit();
+    NimBLEDevice::deinit();
 
     // NVS全体を消去
     ret = nvs_flash_erase();

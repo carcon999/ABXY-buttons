@@ -40,4 +40,7 @@
 // Enter deep sleep mode if there is a long period of inactivity.
 #define IDLE_TIMEOUT_NO_USE_MS        (180 * 1000L) 
 
+// Timeout period for advertisements when not connected.
+#define ADVERTISING_TIMEOUT_MS        (60 * 1000L)
+
 #endif // SETTING_H

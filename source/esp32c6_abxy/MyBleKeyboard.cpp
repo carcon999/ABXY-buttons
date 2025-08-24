@@ -14,36 +14,9 @@ bool MyBleKeyboard::isConnected(void) {
 }
 
 void MyBleKeyboard::begin(uint8_t init_batt) {
-    // Initialize the BLE device with the specified device name.
-    BLEDevice::init(DEVICE_NAME);
 
-    // Create a new BLE server instance.
-    BLEServer* pServer = BLEDevice::createServer();
-
-    // Set BLE authentication requirements for bonding.
-    // ESP_LE_AUTH_REQ_SC_MITM_BOND requests Secure Connections, MITM protection, and bonding.
-    esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
-    esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, &auth_req, sizeof(uint8_t));
-
-    // Set IO capabilities. ESP_IO_CAP_NONE means the device has no display or input capabilities,
-    // so pairing will typically proceed without user interaction (e.g., no PIN code entry).
-    uint8_t io_cap = ESP_IO_CAP_NONE; 
-    esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, &io_cap, sizeof(uint8_t)); 
-
-    // Set the initial battery level for the BleKeyboard service.
-    // This value will be reported to connected hosts.
     BleKeyboard::setBatteryLevel(init_batt);
-    
-    Debug.printf("init_batt: %d%%\n", init_batt);
-
-    // Initialize and start the BleKeyboard service on the created BLE server.
-    // This adds the HID and Battery services to the server.
     BleKeyboard::begin();
-
-    //Debug.printf("Bonded device num = %d\n", esp_ble_get_bond_device_num());
-
-    // Start BLE advertising to make the device discoverable.
-    startAdvertising(pServer);
 
     Debug.println("BLE Keyboard Ready! Waiting for connection...");
 }
@@ -52,28 +25,37 @@ void MyBleKeyboard::end(void) {
     BleKeyboard::end();
 }
 
-void MyBleKeyboard::startAdvertising(BLEServer* pServer) {
-    BLEAdvertising* advertising = pServer->getAdvertising(); 
-    if (advertising == nullptr) {
-        Debug.println("Advertising object is null, cannot start.");
-        return;
-    }
+void MyBleKeyboard::onStarted(NimBLEServer *pServer)
+{
+    BleKeyboard::onStarted(pServer);
+    Debug.println("MyBleKeyboard: onStarted");
 
-    advertising->addServiceUUID(BLEUUID((uint16_t)0x1812)); // HID Service UUID
-    advertising->addServiceUUID(BLEUUID((uint16_t)0x180F)); // Battery Service UUID
-    advertising->setScanResponse(true); 
-
-    advertising->setAdvertisementType(ADV_TYPE_IND); 
-    advertising->setMinPreferred(0x800); // 1280ms
-    advertising->setMaxPreferred(0x800); // 1280ms
-    
-    advertising->start(); 
+    NimBLEAdvertising* pAdvertising = pServer->getAdvertising();
+    pAdvertising->setMinInterval(0x0020); // 20ms
+    pAdvertising->setMaxInterval(0x0030); // 30ms
 }
 
-// onConnect callback
-void MyBleKeyboard::onConnect(BLEServer* pServer) {
-    BleKeyboard::onConnect(pServer); 
+void MyBleKeyboard::onConnect(NimBLEServer* pServer, NimBLEConnInfo &connInfo)
+{
+    BleKeyboard::onConnect(pServer, connInfo);
     Debug.println("MyBleKeyboard: Client connected!");
+
+    // 接続相手の OTA アドレス（MAC アドレス）を取得
+    NimBLEAddress peerAddr = connInfo.getAddress();
+    Debug.print("Connected to: ");
+    Debug.println(peerAddr.toString().c_str());
+
+    // 接続ハンドルを取得
+    uint16_t connHandle = connInfo.getConnHandle();
+
+    // 接続パラメータを変更
+    uint16_t minInterval = 6;   // 7.5ms * 6 = 45ms
+    uint16_t maxInterval = 12;  // 7.5ms * 12 = 90ms
+    uint16_t latency     = 0;
+    uint16_t timeout     = 200; // supervision timeout
+
+    // Arduino版ではこの形で呼ぶ
+    pServer->updateConnParams(connHandle, minInterval, maxInterval, latency, timeout);
 
     // 状態が変化した場合のみコールバックを呼び出す
     if (_lastConnectedState == false) { // ★修正点★
@@ -84,9 +66,9 @@ void MyBleKeyboard::onConnect(BLEServer* pServer) {
     }
 }
 
-// onDisconnect callback
-void MyBleKeyboard::onDisconnect(BLEServer* pServer) {
-    BleKeyboard::onDisconnect(pServer);
+void MyBleKeyboard::onDisconnect(NimBLEServer* pServer, NimBLEConnInfo &connInfo, int reason)
+{
+    BleKeyboard::onDisconnect(pServer, connInfo, reason);
     Debug.println("MyBleKeyboard: Client disconnected! Restarting advertising...");
 
     // 状態が変化した場合のみコールバックを呼び出す

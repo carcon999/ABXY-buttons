@@ -2,8 +2,9 @@
 ESP32やBLEのライブラリは更新が頻繁にあるので、Versionが異なるとエラーが発生することがあります。異なるVersionを利用する際には注意してください。私は以下のものを利用しています。
 - [Arduino IDE 2.3.6](https://www.arduino.cc/en/software/)
 - ボードマネージャー [esp32 by Espressif Systems 3.3.0](https://github.com/espressif/arduino-esp32)
-- BLEライブラリ [NimBLE-Arduino by h2zero 2.3.4](https://github.com/h2zero/NimBLE-Arduino)
+- BLEライブラリ [NimBLE-Arduino by h2zero 2.3.6](https://github.com/h2zero/NimBLE-Arduino)
 - キーボードライブラリ [ESP32-NIMBLE-Keyboard](https://github.com/Berg0162/ESP32-NIMBLE-Keyboard)
+- ゲームパッドライブラリ[ESP32-BLE-Gamepad](https://github.com/lemmingDev/ESP32-BLE-Gamepad)
 
 ### 前提条件
 Arduino IDEインストールと、XIAO ESP32C6のボードが利用できている状態とします。
@@ -11,8 +12,9 @@ Arduino IDEインストールと、XIAO ESP32C6のボードが利用できてい
 
 ### ライブラリのインストール
 ライブラリを2つインストールします。
-- 最初に、Arduinoのライブラリマネージャーで、"NimBLE-Arduino"を検索すると表示されますので、2.3.4版をインストールします。（画像左）
+- 最初に、Arduinoのライブラリマネージャーで、"NimBLE-Arduino"を検索すると表示されますので、2.3.6版をインストールします。（画像左）
 - 次に、[ESP32-NIMBLE-Keyboard](https://github.com/Berg0162/ESP32-NIMBLE-Keyboard)をzipダウンロードして追加します。
+- もしゲームパッドとして利用する場合には、[ESP32-BLE-Gamepad](https://github.com/lemmingDev/ESP32-BLE-Gamepad)をzipダウンロードして追加します。
 
 ![ライブラリイメージ画像](../image/SOFTWARE_BUILD/library.png)
 
@@ -36,7 +38,14 @@ Arduino IDEインストールと、XIAO ESP32C6のボードが利用できてい
 ![分解イメージ画像](../image/SOFTWARE_BUILD/arduino_tool.png)
 
 ### ビルド
-設計資料にある[ソースコード](./source/esp32c6_abxy/)をダウンロードし、Arduino IDEでesp32c6_abxy.inoを開き、ビルドします。もし、ビルドエラーが発生する場合には、Versionの違いに注意してください。とくにボードマネージャーのVersionの違いに注意してください。<br>
+設計資料にある[ソースコード](./source/esp32c6_abxy/)をダウンロードし、Arduino IDEでesp32c6_abxy.inoを開きます。
+もし、ゲームパッドとして利用する場合には、Setting.hのIS_GAME_CONTROLLERを1に変更します。デフォルトは0でキーボードとなっています。
+```cpp
+// If you are using it as a keyboard, set it to 0;
+// if you are using it as a game controller, set it to 1.
+#define IS_GAME_CONTROLLER              (1)
+```
+次にビルドします。もし、ビルドエラーが発生する場合には、Versionの違いに注意してください。とくにボードマネージャーのVersionの違いに注意してください。<br>
 ※ESP32は頻繁に更新されるため違いが発生しやすいです。
 
 ### 書き込み

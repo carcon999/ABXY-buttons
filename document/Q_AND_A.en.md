@@ -16,4 +16,8 @@ Starting in Bootloader mode will ensure the serial port is enabled.
 ### ■ Specific A, B, X, or Y button does not respond
 Dust or debris may be attached to the conductive rubber. Disassemble the device and clean the contact points.
 
+### ■ Serial port not recognized (Part 2)
+Please try using a different Type-C cable.  
+Make sure it is not a charging-only cable, but one that supports data communication.
+
 [Back](../README.en.md)

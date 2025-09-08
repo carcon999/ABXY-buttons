@@ -1,8 +1,9 @@
 #ifndef SETTING_H
 #define SETTING_H
 
-// XIAO ESP32C6 use
-#define ARDUINO_XIAO_ESP32C6
+// If you are using it as a keyboard, set it to 0;
+// if you are using it as a game controller, set it to 1.
+#define IS_GAME_CONTROLLER              (0)
 
 // Enables debug output to the serial port.
 #define DEBUG_ENABLED                   (0)
@@ -11,7 +12,12 @@
 
 #define IDLE_TIMEOUT_ENABLED            (0)
 
-#define DEVICE_NAME         "SF/SNES A,B,X,Y Button"
+
+#if IS_GAME_CONTROLLER
+#define DEVICE_NAME         "Controller"
+#else
+#define DEVICE_NAME         "ABXY-buttons"
+#endif
 #define DEVICE_MANUFACTURER "@carcon999" 
 
 // --- port define. ---

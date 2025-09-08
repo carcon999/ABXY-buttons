@@ -1,5 +1,5 @@
 #include "Setting.h" // User-defined pin definitions and other constants
-#include "MyBleKeyboard.h"
+#include "MyBle.h"
 #include "nvs_flash.h"
 
 // Include custom classes
@@ -11,18 +11,26 @@
 
 // キーのタイプを定義するenum
 enum KeyType {
+#if IS_GAME_CONTROLLER
+    BUTTON,
+    HAT,
+    SPECIAL,
+#else
     KEYBOARD_KEY,
     MEDIA_KEY,
     STRING_TYPE,
     NO_KEY
+#endif
 };
 
 struct KeyMap {
     KeyType keyType;
     union {
         uint8_t key;
+#if !IS_GAME_CONTROLLER
         const MediaKeyReport* media;
         const char* string;
+#endif
     } keyData;
 };
 
@@ -40,6 +48,16 @@ struct ButtonMap buttonMaps[] = {
 const int NUM_ALL_BUTTONS = sizeof(buttonMaps) / sizeof(buttonMaps[0]);
 
 struct KeyMap keyMaps[] = {
+#if IS_GAME_CONTROLLER
+    //keyType,         key
+    {BUTTON,          {.key = BUTTON_1}},
+    {BUTTON,          {.key = BUTTON_2}},
+    {BUTTON,          {.key = BUTTON_3}},
+    {BUTTON,          {.key = BUTTON_4}},
+    {BUTTON,          {.key = BUTTON_5}},
+    {BUTTON,          {.key = BUTTON_6}},
+    {BUTTON,          {.key = BUTTON_7}}
+#else
     //keyType,         keyData (union)
     {KEYBOARD_KEY,    {.key = KEY_RIGHT_ARROW}},
     {KEYBOARD_KEY,    {.key = KEY_DOWN_ARROW}},
@@ -50,6 +68,7 @@ struct KeyMap keyMaps[] = {
     {NO_KEY,          {.key = 0}}
     // Example of a STRING_TYPE button (uncomment and add a pin if needed)
     // {NEW_GREETING_PIN,STRING_TYPE,   {.string = "Hello World!"},       INPUT_PULLUP, LOW}
+#endif
 };
 
 #define KEY_A_INDEX             (0)
@@ -67,7 +86,7 @@ const int wakeupPins[] = {
 const int NUM_WAKEUP_PINS = sizeof(wakeupPins) / sizeof(wakeupPins[0]);
 
 // --- Global Class Pointers (initialized in setup() based on dependencies) ---
-MyBleKeyboard bleKeyboard(DEVICE_NAME, DEVICE_MANUFACTURER, 80); 
+MyBle myBle(DEVICE_NAME, DEVICE_MANUFACTURER, 80); 
 ButtonManager buttonManager(buttonMaps, NUM_ALL_BUTTONS);
 SleepManager sleepManager(wakeupPins, NUM_WAKEUP_PINS);
 LedController led(LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_BUILTIN);
@@ -85,11 +104,11 @@ void onButtonCenterLongPress(int pin);
 void factory_reset(void);
 
 void updateLedStatus(void){
-    bool isConnect = bleKeyboard.isConnected();
+    bool isConnect = myBle.isConnected();
     bool isLowBatt = batteryManager.getPercent() <= LOW_BATTERY_PERCENT;
 
     // 接続中
-    if(bleKeyboard.isConnected()){
+    if(isConnect){
         if(isLowBatt){
             led.setColor(COLOR_GREEN, 1000);
         }else{
@@ -130,9 +149,10 @@ void setup() {
         while(1){};
     }
 
+#if !IS_GAME_CONTROLLER
     // コールバック関数を登録
-    bleKeyboard.setConnectionCallback(handleConnectionStatusChange);
-
+    myBle.setConnectionCallback(handleConnectionStatusChange);
+#endif
 
     batteryManager.setBatteryLevelCallback(onBatteryLevelChange);
     batteryManager.begin();
@@ -144,7 +164,7 @@ void setup() {
     // initialBatteryLevel = batteryManager.getPercent();
     Debug.printf("initialBatteryLevel: %d%%\n", initialBatteryLevel);
 
-    bleKeyboard.begin(initialBatteryLevel);
+    myBle.begin(initialBatteryLevel);
     mDisconnectedTime = millis();
 
     buttonManager.setButtonCallback(onButtonStateChange);
@@ -181,6 +201,10 @@ void loop() {
     // Avoid prolonged periods of disconnection. Reduce battery consumption.
     checkAdvertisingTimeout();
 
+#if IS_GAME_CONTROLLER
+    checkConnectionStatus();
+#endif
+
     // Update and report battery level via BatteryManager
     batteryManager.handleBatteryUpdate();
 
@@ -199,6 +223,22 @@ void checkAdvertisingTimeout(void){
     }
 }
 
+#if IS_GAME_CONTROLLER
+void checkConnectionStatus(void) {
+    bool isConnect = myBle.isConnected();
+
+    if (isConnect && mDisconnectedTime != 0) {
+        mDisconnectedTime = 0;  // clear
+        Debug.println("Callback: BLE connected! Setting LED to green.");
+        updateLedStatus();
+    } else if(!isConnect && mDisconnectedTime == 0) {
+        mDisconnectedTime = millis();
+        Debug.println("Callback: BLE disconnected! Starting red blinking.");
+        updateLedStatus();
+    }
+
+}
+#else
 // 接続状態が変化したときに呼び出されるコールバック関数
 void handleConnectionStatusChange(bool isConnected) {
     if (isConnected) {
@@ -211,10 +251,11 @@ void handleConnectionStatusChange(bool isConnected) {
 
     updateLedStatus();
 }
+#endif
 
 void onBatteryLevelChange(uint8_t newLevel) {
 
-    bleKeyboard.setBatteryLevel(newLevel);
+    myBle.setBatteryLevel(newLevel);
 
     if (newLevel == 0) {
         Debug.println("Battery voltage is low, entering Deep Sleep...");
@@ -228,7 +269,7 @@ void onBatteryLevelChange(uint8_t newLevel) {
 
 // ボタンの状態変化を処理するコールバック関数
 void onButtonStateChange(int index, bool isPressed) { // ★追加点★
-    if (!bleKeyboard.isConnected()) {
+    if (!myBle.isConnected()) {
         return;
     }
 
@@ -236,29 +277,53 @@ void onButtonStateChange(int index, bool isPressed) { // ★追加点★
 
     if (isPressed) {
         switch (map.keyType) {
+#if IS_GAME_CONTROLLER
+            case BUTTON:
+                myBle.press(map.keyData.key);
+                break;
+            case HAT:
+                myBle.setHat1(map.keyData.key);
+                break;
+            case SPECIAL:
+                myBle.pressSpecialButton(map.keyData.key);
+                break;
+#else
             case KEYBOARD_KEY:
-                bleKeyboard.press(map.keyData.key);
+                myBle.press(map.keyData.key);
                 break;
             case MEDIA_KEY:
-                bleKeyboard.press(*(map.keyData.media));
+                myBle.press(*(map.keyData.media));
                 break;
             case STRING_TYPE:
-                bleKeyboard.print(map.keyData.string);
+                myBle.print(map.keyData.string);
                 break;
+#endif
             default:
                 break;
         }
     } else { // Released
         switch (map.keyType) {
+#if IS_GAME_CONTROLLER
+            case BUTTON:
+                myBle.release(map.keyData.key);
+                break;
+            case HAT:
+                myBle.setHat1(HAT_CENTERED);
+                break;
+            case SPECIAL:
+                myBle.releaseSpecialButton(map.keyData.key);
+                break;
+#else
             case KEYBOARD_KEY:
-                bleKeyboard.release(map.keyData.key);
+                myBle.release(map.keyData.key);
                 break;
             case MEDIA_KEY:
-                bleKeyboard.release(*(map.keyData.media));
+                myBle.release(*(map.keyData.media));
                 break;
             case STRING_TYPE:
                 // String type doesn't have a release action
                 break;
+#endif
             default:
                 break;
         }
@@ -284,7 +349,7 @@ void enterDeepSleep(void){
     // Set all LEDs to OFF state before entering sleep
     led.setColor(COLOR_BLACK); // Turn off RGB LED
     led.setBuiltinLed(true);   // Turn off built-in LED (assuming HIGH is OFF)
-    bleKeyboard.end();
+    myBle.end();
     
     // Enter deep sleep via SleepManager
     sleepManager.enterDeepSleep(); 
@@ -308,8 +373,7 @@ void factory_reset(void) {
 
     led.setColor(COLOR_YELLOW);
 
-    // Bluetooth スタック停止
-    NimBLEDevice::deinit();
+    myBle.stop();
 
     // NVS全体を消去
     ret = nvs_flash_erase();
